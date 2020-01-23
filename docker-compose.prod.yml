@@ -1,0 +1,48 @@
+version: '2.1'
+services:
+
+  postgres:
+    restart: always
+
+  rabbitmq:
+    restart: always
+
+  app:
+    restart: always
+    build:
+      args:
+        CURRENT_ENV: prod
+    environment:
+      - CURRENT_ENV=prod
+    volumes:
+      - ./static/:/opt/app/static
+    command: bash -c "
+             alembic upgrade head &&
+             flask collect &&
+             /usr/sbin/unitd --no-daemon --control unix:/var/run/control.unit.sock"
+
+  dramatiq-worker:
+    restart: always
+    build:
+      args:
+        CURRENT_ENV: prod
+    environment:
+      - CURRENT_ENV=prod
+    command: bash -c "dramatiq app"
+
+  web-server:
+    restart: always
+    build:
+      context: ./conf_files/nginx/
+      args:
+        ADMIN_USER: $ADMIN_USER
+        ADMIN_PASSWORD: $ADMIN_PASSWORD
+    ports:
+      - 80:80
+    links:
+      - app
+    volumes:
+      - ./static/:/opt/app/static/
+      - ./conf_files/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app

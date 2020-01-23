@@ -1,0 +1,50 @@
+openapi: "3.0.0"
+info:
+  title: API bulls and cows game
+  version: 1.0.0
+paths:
+  /new_game:
+    get:
+      summary: "Запускает новую игру для текущего пользователя"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - "success"
+                      - "error"
+  /check_answer:
+    get:
+      summary: "Выполняет проверку угадал пользователь загаданное число или нет"
+      parameters:
+        - in: query
+          name: "answer"
+          required: true
+          description: "Введеное пользователем число"
+          schema:
+            type: integer
+            example: 2352
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bulls:
+                    type: integer
+                  cows:
+                    type:
+                      integer
+                  status:
+                    type: string
+                    enum:
+                      - "success"
+                      - "error"

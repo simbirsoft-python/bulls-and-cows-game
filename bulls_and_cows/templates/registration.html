@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+
+{% block registration %}
+<div class="row">
+   <div class="col-md-4 col-md-offset-4">
+      {% if not is_success %}
+         <div class="alert alert-danger">
+            <p class="text-center">
+               <strong>Ошибка!</strong> При регистрации нового пользователя возникли неприведнные проблемы,
+               приносим изменения.
+            </p>
+         </div>
+      {% endif %}
+
+      {% if reg_done %}
+         <div class="alert alert-info">
+            <p class="text-center">
+               Вам на почту отправлено письмо с подтверждением регистрации. Проверьте почту.
+            </p>
+         </div>
+      {% endif %}
+
+      <h3><p class="text-center">Регистрация</p></h3>
+      <form action="{{ url_for('bulls_and_cows.AccountView:registration') }}" method="post">
+         {% from "_formhelpers.html" import render_field, render_csrf_token_field %}
+         {{ render_csrf_token_field(form) }}
+         <dl>
+            {{ render_field(form.nick, class_="form-control") }}
+            {{ render_field(form.email, class_="form-control") }}
+            {{ render_field(form.password, class_="form-control") }}
+            {{ render_field(form.password_verification, class_="form-control") }}
+         </dl>
+         <p><input type=submit class="btn btn-primary btn-block" value=Зарегистрироваться></p>
+         <p class="text-center">Уже зарегистрированны?
+            <a href="{{ url_for('bulls_and_cows.AccountView:login') }}">Авторизация</a>
+         </p>
+         <p class="text-center">Не пришло письмо с ссылкой для акативации аккаунта?
+            <a href="{{ url_for('bulls_and_cows.AccountView:resend_confirmation_token') }}">
+               Повторная отправка письма
+            </a>
+         </p>
+      </form>
+   </div>
+</div>
+{% endblock %}

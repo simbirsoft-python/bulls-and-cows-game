@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+  app:
+    build:
+      args:
+        CURRENT_ENV: dev
+    environment:
+      - CURRENT_ENV=dev
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/opt/app/
+    command: bash -c "alembic upgrade head && python3 app.py"
+
+  dramatiq-worker:
+    build:
+      args:
+        CURRENT_ENV: dev
+    environment:
+    - CURRENT_ENV=dev
+    command: bash -c "dramatiq app --watch ."

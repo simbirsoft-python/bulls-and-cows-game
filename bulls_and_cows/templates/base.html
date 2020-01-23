@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="shortcut icon" href="{{ url_for('bulls_and_cows.static', filename='images/favicon.ico') }}" type="image/x-icon">
+   <title>{% block title %}{% endblock %}</title>
+
+   <!-- Bootstrap -->
+   <link rel="stylesheet" href="{{ url_for('bulls_and_cows.static', filename='css/bootstrap.min.css') }}">
+   <script src="{{ url_for('bulls_and_cows.static', filename='js/jquery.min.js') }}"></script>
+   <script src="{{ url_for('bulls_and_cows.static', filename='js/bootstrap.min.js') }}"></script>
+
+   <script>
+       {# Реализация форматирования строк #}
+       if (!String.prototype.format) {
+           String.prototype.format = function () {
+               var args = arguments;
+               return this.replace(/{(\d+)}/g, function (match, number) {
+                   return typeof args[number] != 'undefined'
+                       ? args[number]
+                       : match
+                       ;
+               });
+           };
+       }
+   </script>
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+   <div class="container-fluid">
+      <div class="navbar-header">
+         <a class="navbar-brand" href="/">Быки и коровы</a>
+      </div>
+      {% if current_user.is_authenticated %}
+         <ul class="nav navbar-nav">
+            <li class="{{ game_active }}"><a href="/">Игра</a></li>
+            <li class="{{ rating_active }}"><a href="/rating/">Рейтинг игроков</a></li>
+         </ul>
+         <ul class="nav navbar-nav navbar-right">
+            <li class="navbar-text">
+               Вы вошли как "{{ current_user.nick }}"
+            </li>
+            <li>
+               <a href="/account/logout/"><span
+                       class="glyphicon glyphicon-log-in"></span> Выход</a>
+            </li>
+         </ul>
+      {% endif %}
+   </div>
+</nav>
+
+<div class="container">
+   {% block auth %}
+   {% endblock %}
+   {% block registration %}
+   {% endblock %}
+   {% block main %}
+   {% endblock %}
+</div>
+
+</body>
+</html>

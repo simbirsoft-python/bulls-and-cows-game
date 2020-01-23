@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "bulls-and-cows-game"
+version = "1.0.0"
+description = ""
+authors = ["Aleksey Petrunnik <zzz_vvv.94@mail.ru>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+flask = "=1.1.1"
+flask-login = "=0.4.1"
+flask-wtf = "=0.14.2"
+flask-classy-mod = { git = "https://alex925@bitbucket.org/alex925/flask-classy-mod.git", branch = "master" }
+flask-mail = "=0.9.1"
+sqlalchemy = "=1.3.4"
+psycopg2-binary = "=2.8.2"
+bcrypt = "=3.1.6"
+wtforms = "=2.1"
+dependency_injector = "=3.14.6"
+flask-swagger-ui = "=3.20.9"
+alembic = "=1.0.10"
+dramatiq = { version = "=1.6.0", extras = [ "rabbitmq", "watch" ] }
+flask-collect = "=1.3.2"
+sqlalchemy-utils = "=0.34.2"
+python-dotenv = "=0.10.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "=5.0.1"
+pytest-flask = "=0.15.0"
+pytest-env = "=0.6.2"
+pytest-factoryboy = "=2.0.3"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

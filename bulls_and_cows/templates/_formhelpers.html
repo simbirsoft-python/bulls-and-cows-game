@@ -1,0 +1,26 @@
+{% macro render_field(field) %}
+<dt>{{ field.label }}
+<dd>{{ field(**kwargs)|safe }}
+    {% if field.errors %}
+    <ul class=errors>
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</dd>
+{% endmacro %}
+
+
+{% macro render_csrf_token_field(form) %}
+   {{ form.hidden_tag() }}
+   {% if form.csrf_token and form.csrf_token.errors %}
+      <div class="alert alert-danger">
+         <ul class=errors>
+            {% for error in form.csrf_token.errors %}
+               <li>{{ error }}</li>
+            {% endfor %}
+         </ul>
+      </div>
+   {% endif %}
+{% endmacro %}

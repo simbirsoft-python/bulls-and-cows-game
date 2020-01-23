@@ -1,0 +1,86 @@
+version: '2.1'
+services:
+
+  postgres:
+    restart: on-failure
+    image: postgres:11.3-alpine
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - $HOME/.docker-volumes/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "/bin/bash",
+        "if  [[ `pg_isready -U db_user` == *accepting connections* ]]; then exit 0; else exit 1; fi"
+      ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  rabbitmq:
+    restart: on-failure
+    image: rabbitmq:3.7.15-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_LOGS
+    ports:
+      - "127.0.0.1:4369:4369"
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+      - "127.0.0.1:25672:25672"
+      - "127.0.0.1:35197:35197"
+    volumes:
+      - $HOME/.docker-volumes/rabbit:/var/lib/rabbitmq
+      - $HOME/.docker-volumes/rabbit/logs:/var/log/rabbitmq
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "rabbitmqctl eval '
+         { true, rabbit_app_booted_and_running } = { rabbit:is_booted(node()), rabbit_app_booted_and_running },
+         { [], no_alarms } = { rabbit:alarms(), no_alarms },
+         [] /= rabbit_networking:active_listeners(),
+         rabbitmq_node_is_healthy.
+         ' || exit 1"
+      ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  dramatiq-worker:
+    build: .
+    restart: on-failure
+    image: bulls_and_cows:1.0.0
+    env_file:
+      - .env
+    environment:
+      - LOCAL_MODE=0
+    links:
+      - rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  app:
+    build: .
+    restart: on-failure
+    image: bulls_and_cows:1.0.0
+    env_file:
+      - .env
+    environment:
+      - LOCAL_MODE=0
+    links:
+      - postgres
+      - rabbitmq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      dramatiq-worker:
+        condition: service_started

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Авторизация{% endblock %}
+
+{% block auth %}
+    <div class="row" id="login-from">
+      <div class="col-md-4 col-md-offset-4">
+         <h3><p class="text-center">Авторизация</p></h3>
+         <form action="{{ url_for('bulls_and_cows.AccountView:login') }}" method="post">
+            {% from "_formhelpers.html" import render_field, render_csrf_token_field %}
+            {{ render_csrf_token_field(form) }}
+            <dl>
+               {{ render_field(form.email, class_="form-control") }}
+               {{ render_field(form.password, class_="form-control") }}
+            </dl>
+            <p><input type=submit class="btn btn-primary btn-block" value=Войти></p>
+            <p class="text-center">
+               <a href="{{ url_for('bulls_and_cows.AccountView:registration') }}">Регистрация</a> |
+               <a href="{{ url_for('bulls_and_cows.AccountView:password_restore') }}">Сброс пароля</a>
+            </p>
+         </form>
+      </div>
+   </div>
+{% endblock %}

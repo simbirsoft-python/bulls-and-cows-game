@@ -1,0 +1,15 @@
+{
+  "listeners": {
+    "*:8080": {
+      "application": "bulls_and_cows"
+    }
+  },
+  "applications": {
+    "bulls_and_cows": {
+      "type": "python",
+      "processes": 4,
+      "path": "/opt/app/",
+      "module": "wsgi"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Рейтинг игроков{% endblock %}
+
+{% block main %}
+   <div class="row">
+      <div class="col-md-12">
+         <h2>Рейтинг</h2>
+         <table class="table table-striped">
+            <thead>
+            <tr>
+               <th>Пользователь</th>
+               <th>Рейтинг</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+               {% for nick, r in rating %}
+                  <tr>
+                     <td>{{ nick }}</td>
+                     <td>{{ r | round(1) }}</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </div>
+{% endblock %}

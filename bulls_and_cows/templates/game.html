@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Быки и коровы{% endblock %}
+
+{% if is_success %}
+   {% set alert_visible = 'none' %}
+{% else %}
+   {% set alert_visible = 'block' %}
+{% endif %}
+
+{% block main %}
+   <script>
+       function sendAnswer(num) {
+           var last_result = $('#game-table tr:last-child td:nth-child(2)').html();
+           if (last_result != undefined) {
+               if (last_result.substring(0, 1) == 4) {
+                   alert('Вы уже отгадали число. Нажмите "Новая игра" для начала нового раунда.');
+                   return
+               }
+           }
+
+           if (!validateAnswer(num)) {
+               return
+           }
+
+           $.ajax({
+               type: 'GET',
+               url: '/check_answer/',
+               data: {
+                   answer: num
+               },
+               success: function (response) {
+                   if (response.answer_error) {
+                       alert(response.answer_error);
+                       return
+                   }
+                   checkAnswer(response.status);
+
+                   addResultToTable(num, response.bulls, response.cows);
+                   if (response.bulls == 4) {
+                       alert("Число отгадано. Поздравляем!");
+                   }
+
+               },
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert('Возникла ошибка при обработке запроса');
+                   console.log(jqXHR, textStatus, errorThrown);
+               }
+           });
+       }
+
+       function addResultToTable(num, bulls, cows) {
+           $('#game-table').prepend(
+               "<tr>" +
+               "<td>{0}</td>".format(num) +
+               "<td>{0} быков, {1} коров</td>".format(bulls, cows) +
+               "</tr>"
+           );
+       }
+
+       function validateAnswer(value) {
+           var pattern = new RegExp('\\d{4}');
+           var result = value.match(pattern);
+           if (result == null || result.length == 4) {
+               alert('Вы должны ввести четырех значное число.');
+               return false
+           }
+
+           var counter = [];
+           for (var i = 0; i < value.length; i++) {
+               if (counter.indexOf(value[i]) == -1) {
+                   counter.push(value[i])
+               }
+           }
+           if (counter.length != 4) {
+               alert('Вы должны ввести четрех значное число (цифры не должны повторяться)');
+               return false
+           }
+
+           return true;
+       }
+
+       function newGame() {
+           $.ajax({
+               type: 'GET',
+               url: '/new_game/',
+               data: {},
+               success: function (response) {
+                   $('#game-table tr').remove();
+                   checkAnswer(response.status);
+               },
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert('Возникла ошибка при обработке запроса');
+                   console.log(jqXHR, textStatus, errorThrown);
+               }
+           });
+       }
+
+       function checkAnswer(status) {
+           if (status === 'error') {
+               $('#warning').show()
+           } else {
+               $('#warning').hide();
+           }
+       }
+   </script>
+
+   <div class="row">
+      <div class="col-md-12">
+         <h2>Быки и коровы</h2>
+         <h4>Правила игры</h4>
+         <p>Компьютер задумывает четырехзначное число. Цифры в числе не
+            повторяются, 0 может стоять на первом месте.
+            Игрок делает ходы, чтобы узнать это число. В ответ на каждый ход
+            компьютер показывает число отгаданных цифр,
+            стоящих на своих местах (число быков) и число отгаданных цифр,
+            стоящих не на своих местах (число коров).</p>
+         <p><h4>Пример</h4> Компьютер задумал 0834. Игрок походил 8134.
+         Компьютер ответил: 2 быка (цифры 3 и 4) и 1 корова (цифра 8).</p>
+         <h5>Компьютер уже загадал число. Играем!</h5>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-md-12">
+         <h4>Найди задуманное число.</h4>
+
+         <div class="alert alert-warning" id="warning"
+              style="display: {{ alert_visible }};">
+            <strong>Предупреждение!</strong> На сайте ведутся профилактические работы,
+            результаты этой игры не будут сохранены.
+         </div>
+      </div>
+
+      <div class="col-xs-2">
+         <p><input type="text" class="form-control" id="answer-field"></p>
+
+         <button type="submit" class="btn btn-primary"
+                 onclick="newGame();">Новая игра
+         </button>
+      </div>
+      <p>
+         <button type="submit" class="btn btn-primary"
+                 onclick="sendAnswer($('#answer-field').val());">Сделать ход
+         </button>
+      </p>
+
+      <div class="col-md-12">
+         <table class="table table-striped">
+            <thead>
+            <tr>
+               <th>Ваш ответ</th>
+               <th>Результат</th>
+            </tr>
+            </thead>
+            <tbody id="game-table">
+            <tr>
+               {% for i in unfinished_game.moves %}
+                  <tr>
+                     {% set bulls, cows = count_bulls_cows(session['secret'], i.answer) %}
+                     <td>{{ i.answer }}</td>
+                     <td>{{ bulls }} быков, {{ cows }} коров</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+
+   </div>
+{% endblock %}
