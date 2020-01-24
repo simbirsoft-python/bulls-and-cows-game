@@ -60,7 +60,7 @@ class AccountView(FlaskView):
                 return render_template(
                     'verify_email.html',
                     message=(
-                        'Во время активации аккаунта возникли неприведнные '
+                        'Во время активации аккаунта возникли непредвиденные '
                         'проблемы.'
                     )
                 )
@@ -184,7 +184,7 @@ class AccountView(FlaskView):
                 return render_template(
                     'password_restore.html', form=form,
                     error_massage=(
-                        'Во время восстановления пароля возникли неприведнные '
+                        'Во время восстановления пароля возникли непредвиденные '
                         'проблемы.'
                     )
                 )
@@ -239,7 +239,7 @@ class AccountView(FlaskView):
                 return render_template(
                     'reset_password.html', token=token, form=form,
                     error_massage=(
-                        'При попытке изменить пароль возникли неприведнные '
+                        'При попытке изменить пароль возникли непредвиденные '
                         'проблемы.'
                     )
                 )

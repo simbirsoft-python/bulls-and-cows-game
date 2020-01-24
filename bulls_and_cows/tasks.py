@@ -16,16 +16,19 @@ class DIServices(di_cnt.DeclarativeContainer):
     time_limit=60000
 )
 def send_verification_email(url: str, email: str, action: str):
-    subject = 'Быки и Коровы'
+    subject_template = 'Быки и Коровы {}'
+    subject_postfix = ''
     body = ''
     if action == 'registration':
-        subject += ' - Регистрация'
+        subject_postfix = ' - Регистрация'
         body = 'Для подтверждения регистрации перейдите по ссылке ' + url
     elif action == 'password_restore':
-        subject += ' - Восстановление пароля'
+        subject_postfix = ' - Восстановление пароля'
         body = 'Для восстановления пароля перейдите по ссылке ' + url
 
-    msg = Message(subject=subject, recipients=[email])
+    msg = Message(
+        subject=subject_template.format(subject_postfix), recipients=[email]
+    )
 
     if body:
         msg.body = body
